@@ -26,7 +26,18 @@ app.get("/", (_req, res) => {
 });
 
 // --- WebSocket server ---
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ noServer: true });
+
+server.on("upgrade", (req, socket, head) => {
+  const pathname = url.parse(req.url).pathname;
+  if (pathname === "/agent" || pathname === "/mobile") {
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit("connection", ws, req);
+    });
+  } else {
+    socket.destroy();
+  }
+});
 
 wss.on("connection", (ws, req) => {
   const pathname = url.parse(req.url).pathname;

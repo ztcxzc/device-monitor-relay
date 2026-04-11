@@ -199,6 +199,13 @@ setInterval(() => {
   }
 }, HEARTBEAT_INTERVAL);
 
+// --- Self-ping to prevent Render free-tier spin-down ---
+const SELF_PING_INTERVAL = 10 * 60_000; // every 10 minutes
+setInterval(() => {
+  const url = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+  fetch(`${url}/`).catch(() => {});
+}, SELF_PING_INTERVAL);
+
 // --- Start ---
 server.listen(PORT, () => {
   console.log(`Relay server listening on port ${PORT}`);

@@ -61,7 +61,7 @@ function handleAgent(ws, req) {
 
   ws.on("message", (raw) => {
     let msg;
-    try { msg = JSON.parse(raw); } catch { return; }
+    try { msg = JSON.parse(raw.toString()); } catch { return; }
 
     // First message must be registration
     if (!pairingCode) {
@@ -122,7 +122,7 @@ function handleMobile(ws, req) {
 
   ws.on("message", (raw) => {
     let msg;
-    try { msg = JSON.parse(raw); } catch { return; }
+    try { msg = JSON.parse(raw.toString()); } catch { return; }
 
     // First message must be pairing code (same protocol as direct connect)
     if (!pairingCode) {

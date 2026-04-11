@@ -162,7 +162,9 @@ function handleMobile(ws, req) {
       const agent = agents.get(pairingCode);
       if (agent) {
         try {
-          agent.ws.send(JSON.stringify({ type: "command", command: msg.command }));
+          const fwd = { type: "command", command: msg.command };
+          if (msg.preset) fwd.preset = msg.preset;
+          agent.ws.send(JSON.stringify(fwd));
         } catch {}
       }
     }

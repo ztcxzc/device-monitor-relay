@@ -60,8 +60,10 @@ function handleAgent(ws, req) {
   ws.on("pong", () => { ws.isAlive = true; });
 
   ws.on("message", (raw) => {
+    const str = raw.toString();
+    console.log(`[agent][raw] ${str.substring(0, 200)}`);
     let msg;
-    try { msg = JSON.parse(raw.toString()); } catch { return; }
+    try { msg = JSON.parse(str); } catch (e) { console.log(`[agent] parse error: ${e.message}`); return; }
 
     // First message must be registration
     if (!pairingCode) {
@@ -90,10 +92,11 @@ function handleAgent(ws, req) {
       if (entry) entry.lastSeen = Date.now();
 
       const subs = subscribers.get(pairingCode);
+      console.log(`[agent] telemetry from ${pairingCode}, subscribers: ${subs ? subs.size : 0}`);
       if (subs && subs.size > 0) {
         const payload = JSON.stringify(msg.data);
         for (const sub of subs) {
-          try { sub.ws.send(payload); } catch {}
+          try { sub.ws.send(payload); } catch (e) { console.log(`[agent] send error: ${e.message}`); }
         }
       }
     }
@@ -121,8 +124,10 @@ function handleMobile(ws, req) {
   const subEntry = { ws, lastSeen: Date.now() };
 
   ws.on("message", (raw) => {
+    const str = raw.toString();
+    console.log(`[mobile][raw] ${str.substring(0, 200)}`);
     let msg;
-    try { msg = JSON.parse(raw.toString()); } catch { return; }
+    try { msg = JSON.parse(str); } catch (e) { console.log(`[mobile] parse error: ${e.message}`); return; }
 
     // First message must be pairing code (same protocol as direct connect)
     if (!pairingCode) {
